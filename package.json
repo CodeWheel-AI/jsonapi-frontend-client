@@ -1,0 +1,44 @@
+{
+  "name": "@codewheel-ai/jsonapi-frontend-client",
+  "version": "0.1.0",
+  "description": "TypeScript client helpers for Drupal drupal/jsonapi_frontend",
+  "homepage": "https://github.com/CodeWheel-AI/jsonapi-frontend-client#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CodeWheel-AI/jsonapi-frontend-client.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CodeWheel-AI/jsonapi-frontend-client/issues"
+  },
+  "keywords": [
+    "drupal",
+    "jsonapi",
+    "headless",
+    "frontend"
+  ],
+  "license": "GPL-2.0-or-later",
+  "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepack": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
