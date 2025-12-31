@@ -1,4 +1,4 @@
-# `@codewheel-ai/jsonapi-frontend-client`
+# `@codewheel/jsonapi-frontend-client`
 
 TypeScript client helpers for Drupal `drupal/jsonapi_frontend`.
 
@@ -7,7 +7,7 @@ This package is **optional**. You can always call `/jsonapi/resolve` directly wi
 ## Install
 
 ```bash
-npm i @codewheel-ai/jsonapi-frontend-client
+npm i @codewheel/jsonapi-frontend-client
 ```
 
 ## Usage
@@ -15,7 +15,7 @@ npm i @codewheel-ai/jsonapi-frontend-client
 Set `DRUPAL_BASE_URL`, then:
 
 ```ts
-import { resolvePath, fetchJsonApi } from "@codewheel-ai/jsonapi-frontend-client"
+import { resolvePath, fetchJsonApi } from "@codewheel/jsonapi-frontend-client"
 
 const resolved = await resolvePath("/about-us")
 if (resolved.resolved && resolved.kind === "entity") {
