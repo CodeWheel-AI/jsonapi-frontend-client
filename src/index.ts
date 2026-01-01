@@ -1,7 +1,7 @@
-export { resolvePath } from "./resolve"
-export { fetchJsonApi, fetchView } from "./fetch"
+export { resolvePath } from "./resolve.js"
+export { fetchJsonApi, fetchView } from "./fetch.js"
 
-export { getDrupalBaseUrl, resolveFileUrl, getFileUrl, getImageStyleUrl } from "./url"
+export { getDrupalBaseUrl, resolveFileUrl, getFileUrl, getImageStyleUrl } from "./url.js"
 
 export {
   findIncluded,
@@ -13,7 +13,7 @@ export {
   extractPrimaryImage,
   extractEmbeddedMediaUuids,
   parseDrupalMediaTag,
-} from "./media"
+} from "./media.js"
 
 export type {
   ResolveResponse,
@@ -22,8 +22,8 @@ export type {
   JsonApiRelationship,
   JsonApiLinks,
   NodeAttributes,
-} from "./types"
+} from "./types.js"
 
-export type { DrupalImageData, DrupalMediaData } from "./media"
+export type { DrupalImageData, DrupalMediaData } from "./media.js"
 
-export type { FetchInit, FetchLike } from "./transport"
+export type { FetchInit, FetchLike } from "./transport.js"

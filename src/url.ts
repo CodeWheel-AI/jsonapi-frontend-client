@@ -1,4 +1,4 @@
-import { getDrupalBaseUrlFromOptions } from "./transport"
+import { getDrupalBaseUrlFromOptions } from "./transport.js"
 
 /**
  * Get the Drupal base URL.

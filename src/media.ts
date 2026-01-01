@@ -1,5 +1,5 @@
-import { JsonApiResource, JsonApiRelationship } from "./types"
-import { getFileUrl } from "./url"
+import { JsonApiResource, JsonApiRelationship } from "./types.js"
+import { getFileUrl } from "./url.js"
 
 export interface DrupalImageData {
   src: string

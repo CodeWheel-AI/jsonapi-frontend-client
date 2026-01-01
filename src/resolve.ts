@@ -1,5 +1,5 @@
-import { ResolveResponse } from "./types"
-import { FetchInit, FetchLike, getDrupalBaseUrlFromOptions, getFetch, mergeHeaders } from "./transport"
+import { ResolveResponse } from "./types.js"
+import { FetchInit, FetchLike, getDrupalBaseUrlFromOptions, getFetch, mergeHeaders } from "./transport.js"
 
 /**
  * Resolve a frontend path to a Drupal resource.

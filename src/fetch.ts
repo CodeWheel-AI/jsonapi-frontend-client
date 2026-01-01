@@ -1,5 +1,5 @@
-import { FetchInit, FetchLike, getDrupalBaseUrlFromOptions, getFetch, mergeHeaders } from "./transport"
-import { JsonApiDocument } from "./types"
+import { FetchInit, FetchLike, getDrupalBaseUrlFromOptions, getFetch, mergeHeaders } from "./transport.js"
+import { JsonApiDocument } from "./types.js"
 
 /**
  * Build cache tags for a JSON:API entity URL (e.g. /jsonapi/node/page/{uuid}).
