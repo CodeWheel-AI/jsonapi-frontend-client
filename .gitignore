@@ -7,3 +7,6 @@
 # Misc
 .DS_Store
 *.log
+
+# Auth (never commit)
+.npmrc
