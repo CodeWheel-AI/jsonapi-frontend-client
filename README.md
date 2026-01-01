@@ -24,6 +24,61 @@ if (resolved.resolved && resolved.kind === "entity") {
 }
 ```
 
+## Astro / Vite (`import.meta.env`)
+
+```ts
+import { resolvePath, fetchJsonApi } from "@codewheel/jsonapi-frontend-client"
+
+const baseUrl = import.meta.env.DRUPAL_BASE_URL
+
+const resolved = await resolvePath("/about-us", { baseUrl })
+if (resolved.resolved && resolved.kind === "entity") {
+  const doc = await fetchJsonApi(resolved.jsonapi_url, { baseUrl })
+}
+```
+
+## Authentication (optional)
+
+Keep credentials server-side. Pass headers via `options.headers`:
+
+```ts
+import { resolvePath } from "@codewheel/jsonapi-frontend-client"
+
+const baseUrl = process.env.DRUPAL_BASE_URL!
+const auth = "Basic " + Buffer.from(`${process.env.DRUPAL_BASIC_USERNAME}:${process.env.DRUPAL_BASIC_PASSWORD}`).toString("base64")
+
+await resolvePath("/about-us", {
+  baseUrl,
+  headers: { Authorization: auth },
+})
+```
+
+```ts
+import { resolvePath } from "@codewheel/jsonapi-frontend-client"
+
+await resolvePath("/about-us", {
+  headers: { Authorization: `Bearer ${process.env.DRUPAL_JWT_TOKEN}` },
+})
+```
+
+## Query building (optional)
+
+This client doesn’t require a query builder, but `drupal-jsonapi-params` works well:
+
+```ts
+import { DrupalJsonApiParams } from "drupal-jsonapi-params"
+import { fetchJsonApi } from "@codewheel/jsonapi-frontend-client"
+
+const baseUrl = process.env.DRUPAL_BASE_URL!
+
+const params = new DrupalJsonApiParams()
+  .addFilter("status", "1")
+  .addFields("node--article", ["title", "path", "body"])
+
+const url = `/jsonapi/node/article?${params.getQueryString()}`
+await fetchJsonApi(url, { baseUrl })
+```
+
 ## URL safety (recommended)
 
 By default, `fetchJsonApi()` and `fetchView()` refuse to fetch absolute URLs on a different origin than your `DRUPAL_BASE_URL` (to avoid accidental SSRF in server environments).
