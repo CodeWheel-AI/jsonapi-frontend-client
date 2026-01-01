@@ -63,6 +63,10 @@ function buildSafeUrl(input: string, base: string, options?: { allowExternalUrls
   return url
 }
 
+function hasAuthLikeHeaders(headers: Headers): boolean {
+  return headers.has("authorization") || headers.has("cookie")
+}
+
 export async function fetchJsonApi<T = JsonApiDocument>(
   jsonapiPath: string,
   options?: {
@@ -102,15 +106,32 @@ export async function fetchJsonApi<T = JsonApiDocument>(
     headers.set("Accept", "application/vnd.api+json")
   }
 
-  const res = await fetcher(url.toString(), {
+  const hasExplicitCache = options?.init?.cache !== undefined
+  const disableCaching = hasAuthLikeHeaders(headers) && !hasExplicitCache
+
+  const init: FetchInit = {
     ...options?.init,
     headers,
-    next: {
-      ...(options?.init?.next ?? {}),
-      revalidate: options?.revalidate,
-      tags: Array.from(new Set([...(options?.init?.next?.tags ?? []), ...tags])),
-    },
-  })
+  }
+
+  if (disableCaching) {
+    init.cache = "no-store"
+    // Avoid mixing Next.js cache options with no-store.
+    delete init.next
+  }
+
+  const fetchInit: FetchInit = disableCaching
+    ? init
+    : {
+        ...init,
+        next: {
+          ...(options?.init?.next ?? {}),
+          revalidate: options?.revalidate,
+          tags: Array.from(new Set([...(options?.init?.next?.tags ?? []), ...tags])),
+        },
+      }
+
+  const res = await fetcher(url.toString(), fetchInit)
 
   if (!res.ok) {
     throw new Error(`JSON:API fetch failed: ${res.status} ${res.statusText}`)
@@ -166,15 +187,31 @@ export async function fetchView<T = JsonApiDocument>(
     headers.set("Accept", "application/vnd.api+json")
   }
 
-  const res = await fetcher(url.toString(), {
+  const hasExplicitCache = options?.init?.cache !== undefined
+  const disableCaching = hasAuthLikeHeaders(headers) && !hasExplicitCache
+
+  const init: FetchInit = {
     ...options?.init,
     headers,
-    next: {
-      ...(options?.init?.next ?? {}),
-      revalidate: options?.revalidate,
-      tags: Array.from(new Set([...(options?.init?.next?.tags ?? []), ...tags])),
-    },
-  })
+  }
+
+  if (disableCaching) {
+    init.cache = "no-store"
+    delete init.next
+  }
+
+  const fetchInit: FetchInit = disableCaching
+    ? init
+    : {
+        ...init,
+        next: {
+          ...(options?.init?.next ?? {}),
+          revalidate: options?.revalidate,
+          tags: Array.from(new Set([...(options?.init?.next?.tags ?? []), ...tags])),
+        },
+      }
+
+  const res = await fetcher(url.toString(), fetchInit)
 
   if (!res.ok) {
     throw new Error(`View fetch failed: ${res.status} ${res.statusText}`)

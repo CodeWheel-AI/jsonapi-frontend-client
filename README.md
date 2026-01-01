@@ -61,6 +61,10 @@ await resolvePath("/about-us", {
 })
 ```
 
+### Caching note (Next.js / SSR)
+
+If you pass `Authorization` (or `Cookie`) headers, this client defaults to `cache: "no-store"` unless you explicitly set `options.init.cache`.
+
 ## Query building (optional)
 
 This client doesn’t require a query builder, but `drupal-jsonapi-params` works well:

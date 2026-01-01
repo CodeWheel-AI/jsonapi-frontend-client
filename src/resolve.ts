@@ -31,14 +31,30 @@ export async function resolvePath(
     headers.set("Accept", "application/vnd.api+json")
   }
 
-  const res = await fetcher(url.toString(), {
+  const hasExplicitCache = options?.init?.cache !== undefined
+  const disableCaching = (headers.has("authorization") || headers.has("cookie")) && !hasExplicitCache
+
+  const init: FetchInit = {
     ...options?.init,
     headers,
-    next: {
-      ...(options?.init?.next ?? {}),
-      revalidate: options?.revalidate,
-    },
-  })
+  }
+
+  if (disableCaching) {
+    init.cache = "no-store"
+    delete init.next
+  }
+
+  const fetchInit: FetchInit = disableCaching
+    ? init
+    : {
+        ...init,
+        next: {
+          ...(options?.init?.next ?? {}),
+          revalidate: options?.revalidate,
+        },
+      }
+
+  const res = await fetcher(url.toString(), fetchInit)
 
   if (!res.ok) {
     throw new Error(`Resolver failed: ${res.status} ${res.statusText}`)
