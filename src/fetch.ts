@@ -45,11 +45,31 @@ export function buildViewCacheTags(dataUrl: string): string[] {
   return tags
 }
 
+function buildSafeUrl(input: string, base: string, options?: { allowExternalUrls?: boolean }): URL {
+  const baseUrl = new URL(base)
+  const url = new URL(input, baseUrl)
+
+  if (!options?.allowExternalUrls && url.origin !== baseUrl.origin) {
+    throw new Error(
+      `Refusing to fetch a URL from a different origin (${url.origin}) than base (${baseUrl.origin}). ` +
+        "Pass allowExternalUrls: true to override."
+    )
+  }
+
+  if (url.protocol !== "http:" && url.protocol !== "https:") {
+    throw new Error(`Unsupported URL protocol "${url.protocol}" (expected http/https)`)
+  }
+
+  return url
+}
+
 export async function fetchJsonApi<T = JsonApiDocument>(
   jsonapiPath: string,
   options?: {
     baseUrl?: string
     envKey?: string
+    /** Allow fetching absolute URLs on other origins (default: false). */
+    allowExternalUrls?: boolean
     include?: string[]
     fields?: Record<string, string[]>
     revalidate?: number
@@ -63,7 +83,7 @@ export async function fetchJsonApi<T = JsonApiDocument>(
   const base = getDrupalBaseUrlFromOptions({ baseUrl: options?.baseUrl, envKey: options?.envKey })
   const fetcher = getFetch(options?.fetch)
 
-  const url = new URL(jsonapiPath, base)
+  const url = buildSafeUrl(jsonapiPath, base, { allowExternalUrls: options?.allowExternalUrls })
 
   if (options?.include?.length) {
     url.searchParams.set("include", options.include.join(","))
@@ -104,6 +124,8 @@ export async function fetchView<T = JsonApiDocument>(
   options?: {
     baseUrl?: string
     envKey?: string
+    /** Allow fetching absolute URLs on other origins (default: false). */
+    allowExternalUrls?: boolean
     /**
      * JSON:API pagination parameters.
      *
@@ -122,7 +144,7 @@ export async function fetchView<T = JsonApiDocument>(
   const base = getDrupalBaseUrlFromOptions({ baseUrl: options?.baseUrl, envKey: options?.envKey })
   const fetcher = getFetch(options?.fetch)
 
-  const url = new URL(dataUrl, base)
+  const url = buildSafeUrl(dataUrl, base, { allowExternalUrls: options?.allowExternalUrls })
 
   if (options?.page !== undefined) {
     if (typeof options.page === "number") {

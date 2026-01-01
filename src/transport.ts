@@ -18,11 +18,23 @@ function getEnvString(key: string): string | undefined {
 }
 
 export function getDrupalBaseUrlFromOptions(options?: { baseUrl?: string; envKey?: string }): string {
-  const baseUrl = options?.baseUrl ?? getEnvString(options?.envKey ?? "DRUPAL_BASE_URL")
-  if (!baseUrl) {
+  const rawBaseUrl = options?.baseUrl ?? getEnvString(options?.envKey ?? "DRUPAL_BASE_URL")
+  if (!rawBaseUrl) {
     throw new Error(`Missing Drupal base URL (pass baseUrl or set ${options?.envKey ?? "DRUPAL_BASE_URL"})`)
   }
-  return baseUrl.replace(/\/$/, "")
+
+  let parsed: URL
+  try {
+    parsed = new URL(rawBaseUrl)
+  } catch {
+    throw new Error(`Invalid Drupal base URL "${rawBaseUrl}" (expected http(s) URL)`)
+  }
+
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    throw new Error(`Invalid Drupal base URL protocol "${parsed.protocol}" (expected http/https)`)
+  }
+
+  return parsed.toString().replace(/\/$/, "")
 }
 
 export function getFetch(fetchLike?: FetchLike): FetchLike {
