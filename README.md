@@ -24,6 +24,22 @@ if (resolved.resolved && resolved.kind === "entity") {
 }
 ```
 
+## Layout Builder (optional)
+
+If you install the `jsonapi_frontend_layout` add-on module, you can resolve a path and (when applicable) receive a normalized Layout Builder tree:
+
+```ts
+import { resolvePathWithLayout, fetchJsonApi } from "@codewheel/jsonapi-frontend-client"
+
+const resolved = await resolvePathWithLayout("/about-us")
+if (resolved.resolved && resolved.kind === "entity") {
+  const doc = await fetchJsonApi(resolved.jsonapi_url)
+  if (resolved.layout) {
+    console.log(resolved.layout.sections)
+  }
+}
+```
+
 ## Astro / Vite (`import.meta.env`)
 
 ```ts
@@ -80,6 +96,17 @@ const paths = routes.map((r) => r.path)
 ```
 
 Keep `ROUTES_FEED_SECRET` server-side only (build environment variables). Do not expose it to browsers.
+
+## Menus (optional)
+
+If you install the `jsonapi_frontend_menu` add-on module, you can fetch a ready-to-render tree:
+
+```ts
+import { fetchMenu } from "@codewheel/jsonapi-frontend-client"
+
+const menu = await fetchMenu("main", { path: "/about-us" })
+console.log(menu.data)
+```
 
 ## Query building (optional)
 

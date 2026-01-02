@@ -16,6 +16,17 @@ export type ResolveResponse =
     }
   | {
       resolved: true
+      kind: "route"
+      canonical: string
+      entity: null
+      redirect: { to: string; status?: number } | null
+      jsonapi_url: null
+      data_url: null
+      headless: false
+      drupal_url: string
+    }
+  | {
+      resolved: true
       kind: "view"
       canonical: string
       entity: null
@@ -47,6 +58,80 @@ export type ResolveResponse =
       headless: false
       drupal_url: null
     }
+
+export interface LayoutTree {
+  source: string
+  view_mode: string
+  sections: LayoutSection[]
+}
+
+export interface LayoutSection {
+  layout_id: string
+  layout_settings: Record<string, unknown>
+  components: LayoutComponent[]
+}
+
+export type LayoutComponent =
+  | {
+      type: "field"
+      uuid: string
+      region: string
+      weight: number
+      plugin_id: string
+      field: { entity_type_id: string; bundle: string; field_name: string } | null
+      settings?: Record<string, unknown>
+    }
+  | {
+      type: "inline_block"
+      uuid: string
+      region: string
+      weight: number
+      plugin_id: string
+      inline_block: {
+        view_mode: string | null
+        block_revision_id: number | null
+        block: { type: string; id: string; jsonapi_url: string } | null
+      } | null
+      settings?: Record<string, unknown>
+    }
+  | {
+      type: "block"
+      uuid: string
+      region: string
+      weight: number
+      plugin_id: string
+      settings?: Record<string, unknown>
+    }
+
+export type LayoutResolveResponse =
+  | (Extract<ResolveResponse, { kind: "entity"; resolved: true }> & { layout?: LayoutTree })
+  | Exclude<ResolveResponse, { kind: "entity"; resolved: true }>
+
+export interface MenuItem {
+  id: string
+  title: string
+  description?: string
+  url: string
+  external: boolean
+  expanded: boolean
+  parent: string | null
+  weight: number
+  active: boolean
+  in_active_trail: boolean
+  resolve: ResolveResponse | null
+  children: MenuItem[]
+}
+
+export interface MenuResponse {
+  data: MenuItem[]
+  meta?: {
+    menu?: string
+    active_trail?: string[]
+    langcode?: string | null
+    path?: string | null
+    resolve?: boolean
+  }
+}
 
 export type RoutesFeedItem =
   | {

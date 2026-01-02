@@ -1,4 +1,4 @@
-import { ResolveResponse } from "./types.js"
+import { LayoutResolveResponse, ResolveResponse } from "./types.js"
 import { FetchInit, FetchLike, getDrupalBaseUrlFromOptions, getFetch, mergeHeaders } from "./transport.js"
 
 /**
@@ -61,4 +61,72 @@ export async function resolvePath(
   }
 
   return (await res.json()) as ResolveResponse
+}
+
+/**
+ * Resolve a frontend path and include a Layout Builder tree when available.
+ *
+ * Falls back to `/jsonapi/resolve` if the add-on module is not installed.
+ */
+export async function resolvePathWithLayout(
+  path: string,
+  options?: {
+    baseUrl?: string
+    envKey?: string
+    langcode?: string
+    revalidate?: number
+    fetch?: FetchLike
+    headers?: HeadersInit
+    init?: FetchInit
+  }
+): Promise<LayoutResolveResponse> {
+  const base = getDrupalBaseUrlFromOptions({ baseUrl: options?.baseUrl, envKey: options?.envKey })
+  const fetcher = getFetch(options?.fetch)
+
+  const url = new URL("/jsonapi/layout/resolve", base)
+  url.searchParams.set("path", path)
+  url.searchParams.set("_format", "json")
+  if (options?.langcode) {
+    url.searchParams.set("langcode", options.langcode)
+  }
+
+  const headers = mergeHeaders(options?.init?.headers, options?.headers)
+  if (!headers.has("Accept")) {
+    headers.set("Accept", "application/vnd.api+json")
+  }
+
+  const hasExplicitCache = options?.init?.cache !== undefined
+  const disableCaching = (headers.has("authorization") || headers.has("cookie")) && !hasExplicitCache
+
+  const init: FetchInit = {
+    ...options?.init,
+    headers,
+  }
+
+  if (disableCaching) {
+    init.cache = "no-store"
+    delete init.next
+  }
+
+  const fetchInit: FetchInit = disableCaching
+    ? init
+    : {
+        ...init,
+        next: {
+          ...(options?.init?.next ?? {}),
+          revalidate: options?.revalidate,
+        },
+      }
+
+  const res = await fetcher(url.toString(), fetchInit)
+
+  if (res.status === 404) {
+    return await resolvePath(path, options)
+  }
+
+  if (!res.ok) {
+    throw new Error(`Layout resolver failed: ${res.status} ${res.statusText}`)
+  }
+
+  return (await res.json()) as LayoutResolveResponse
 }

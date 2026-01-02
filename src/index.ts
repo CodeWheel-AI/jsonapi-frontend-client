@@ -1,6 +1,7 @@
-export { resolvePath } from "./resolve.js"
+export { resolvePath, resolvePathWithLayout } from "./resolve.js"
 export { fetchJsonApi, fetchView } from "./fetch.js"
 export { fetchRoutesPage, iterateRoutes, collectRoutes } from "./routes.js"
+export { fetchMenu } from "./menu.js"
 
 export { getDrupalBaseUrl, resolveFileUrl, getFileUrl, getImageStyleUrl } from "./url.js"
 
@@ -18,6 +19,12 @@ export {
 
 export type {
   ResolveResponse,
+  LayoutResolveResponse,
+  LayoutTree,
+  LayoutSection,
+  LayoutComponent,
+  MenuItem,
+  MenuResponse,
   RoutesFeedItem,
   RoutesFeedResponse,
   JsonApiDocument,
